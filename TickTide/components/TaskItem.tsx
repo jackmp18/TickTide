@@ -1,35 +1,53 @@
+// components/TaskItem.tsx
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import Checkbox from 'expo-checkbox';
+import { View, Text, StyleSheet } from 'react-native';
+import { Checkbox, IconButton } from 'react-native-paper';
 
-interface TaskItemProps {
+interface Props {
   title: string;
   completed: boolean;
   onToggle: () => void;
   onDelete: () => void;
   editMode: boolean;
+  checkboxColor: string;
+  strikeColor: string;
 }
 
-const TaskItem: React.FC<TaskItemProps> = ({ title, completed, onToggle, onDelete, editMode }) => {
+const TaskItem: React.FC<Props> = ({
+  title,
+  completed,
+  onToggle,
+  onDelete,
+  editMode,
+  checkboxColor,
+  strikeColor,
+}) => {
   return (
-    <View style={styles.taskItem}>
+    <View style={styles.container}>
+      <Checkbox
+        status={completed ? 'checked' : 'unchecked'}
+        onPress={onToggle}
+        color={checkboxColor}
+      />
+      <Text
+        style={[
+          styles.text,
+          completed && {
+            textDecorationLine: 'line-through',
+            textDecorationColor: strikeColor,
+          },
+        ]}
+      >
+        {title}
+      </Text>
       {editMode && (
-        <TouchableOpacity onPress={onDelete} style={styles.deleteButton}>
-          <Text style={styles.deleteText}>✕</Text>
-        </TouchableOpacity>
-      )}
-      
-      <TouchableOpacity onPress={onToggle} style={styles.contentWrapper}>
-        <Checkbox
-          value={completed}
-          onValueChange={onToggle}
-          color={completed ? '#FF6B6B' : undefined}
-          style={styles.checkbox}
+        <IconButton
+          icon="delete"
+          onPress={onDelete}
+          size={20}
+          accessibilityLabel="Delete task"
         />
-        <Text style={[styles.taskText, completed && styles.completedText]}>
-          {title}
-        </Text>
-      </TouchableOpacity>
+      )}
     </View>
   );
 };
@@ -37,33 +55,14 @@ const TaskItem: React.FC<TaskItemProps> = ({ title, completed, onToggle, onDelet
 export default TaskItem;
 
 const styles = StyleSheet.create({
-  taskItem: {
+  container: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 10,
-    paddingHorizontal: 20,
+    padding: 10,
   },
-  deleteButton: {
-    marginRight: 10,
-  },
-  deleteText: {
-    fontSize: 18,
-    color: '#FF6B6B',
-  },
-  contentWrapper: {
-    flexDirection: 'row',
-    alignItems: 'center',
+  text: {
     flex: 1,
-  },
-  checkbox: {
-    marginRight: 15,
-  },
-  taskText: {
-    fontSize: 20,
-    color: '#2E2E2E',
-  },
-  completedText: {
-    textDecorationLine: 'line-through',
-    color: '#999',
+    fontSize: 16,
+    marginHorizontal: 8,
   },
 });

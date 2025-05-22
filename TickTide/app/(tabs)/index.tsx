@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
+// screens/Index.tsx
+import React, { useState, useContext } from 'react';
 import { View, StyleSheet, Alert } from 'react-native';
 import TaskItem from '@/components/TaskItem';
 import AddTaskBar from '@/components/AddTaskBar';
+import { ColorContext } from '@/context/ColorContext';
 
 interface Task {
   id: number;
@@ -10,6 +12,7 @@ interface Task {
 }
 
 export default function Index() {
+  const { checkboxColor, strikeColor } = useContext(ColorContext);
   const [tasks, setTasks] = useState<Task[]>([
     { id: 1, title: 'Buy groceries', completed: true },
     { id: 2, title: 'Call plumber', completed: false },
@@ -17,19 +20,19 @@ export default function Index() {
   const [editMode, setEditMode] = useState<boolean>(false);
 
   const toggleTask = (id: number) => {
-    setTasks((prev) =>
-      prev.map((t) => (t.id === id ? { ...t, completed: !t.completed } : t))
+    setTasks(prev =>
+      prev.map(t => (t.id === id ? { ...t, completed: !t.completed } : t))
     );
   };
 
   const deleteTask = (id: number) => {
-    setTasks((prev) => prev.filter((t) => t.id !== id));
+    setTasks(prev => prev.filter(t => t.id !== id));
   };
 
   const addTask = () => {
-    Alert.prompt('New Task', 'Enter a task name', (text) => {
+    Alert.prompt('New Task', 'Enter a task name', text => {
       if (text?.trim()) {
-        setTasks((prev) => [
+        setTasks(prev => [
           ...prev,
           { id: Date.now(), title: text.trim(), completed: false },
         ]);
@@ -38,13 +41,17 @@ export default function Index() {
   };
 
   const toggleEditMode = () => {
-    setEditMode((prev) => !prev);
+    setEditMode(prev => !prev);
   };
 
   return (
     <View style={styles.container}>
-      <AddTaskBar onAdd={addTask} onToggleEdit={toggleEditMode} editMode={editMode} />
-      {tasks.map((task) => (
+      <AddTaskBar
+        onAdd={addTask}
+        onToggleEdit={toggleEditMode}
+        editMode={editMode}
+      />
+      {tasks.map(task => (
         <TaskItem
           key={task.id}
           title={task.title}
@@ -52,6 +59,8 @@ export default function Index() {
           onToggle={() => toggleTask(task.id)}
           onDelete={() => deleteTask(task.id)}
           editMode={editMode}
+          checkboxColor={checkboxColor}
+          strikeColor={strikeColor}
         />
       ))}
     </View>
