@@ -1,9 +1,59 @@
-import { Text, View, StyleSheet } from 'react-native';
+import React, { useState } from 'react';
+import { View, StyleSheet, Alert } from 'react-native';
+import TaskItem from '@/components/TaskItem';
+import AddTaskBar from '@/components/AddTaskBar';
+
+interface Task {
+  id: number;
+  title: string;
+  completed: boolean;
+}
 
 export default function Index() {
+  const [tasks, setTasks] = useState<Task[]>([
+    { id: 1, title: 'Buy groceries', completed: true },
+    { id: 2, title: 'Call plumber', completed: false },
+  ]);
+  const [editMode, setEditMode] = useState<boolean>(false);
+
+  const toggleTask = (id: number) => {
+    setTasks((prev) =>
+      prev.map((t) => (t.id === id ? { ...t, completed: !t.completed } : t))
+    );
+  };
+
+  const deleteTask = (id: number) => {
+    setTasks((prev) => prev.filter((t) => t.id !== id));
+  };
+
+  const addTask = () => {
+    Alert.prompt('New Task', 'Enter a task name', (text) => {
+      if (text?.trim()) {
+        setTasks((prev) => [
+          ...prev,
+          { id: Date.now(), title: text.trim(), completed: false },
+        ]);
+      }
+    });
+  };
+
+  const toggleEditMode = () => {
+    setEditMode((prev) => !prev);
+  };
+
   return (
     <View style={styles.container}>
-      <Text style={styles.text}>Home screen</Text>
+      <AddTaskBar onAdd={addTask} onToggleEdit={toggleEditMode} editMode={editMode} />
+      {tasks.map((task) => (
+        <TaskItem
+          key={task.id}
+          title={task.title}
+          completed={task.completed}
+          onToggle={() => toggleTask(task.id)}
+          onDelete={() => deleteTask(task.id)}
+          editMode={editMode}
+        />
+      ))}
     </View>
   );
 }
@@ -11,11 +61,6 @@ export default function Index() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#c2b280',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  text: {
-    color: '#2E2E2E',
+    backgroundColor: '#FAF9F6',
   },
 });
